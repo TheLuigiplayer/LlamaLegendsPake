@@ -48,6 +48,16 @@ on:
         required: false
         type: boolean
         default: false
+      new_window:
+        description: "Links in einem neuen Fenster öffnen"
+        required: false
+        type: boolean
+        default: false
+      keep_binary:
+        description: "Rust-Binary nach dem Build behalten (debug)"
+        required: false
+        type: boolean
+        default: false
       targets:
         description: "Package formats (comma-separated: deb,appimage,rpm)"
         required: false
@@ -124,6 +134,15 @@ jobs:
             ARGS+=("--multi-arch")
           fi
 
+          # Neue Flags
+          if [ "${{ inputs.new_window }}" == "true" ]; then
+            ARGS+=("--new-window")
+          fi
+
+          if [ "${{ inputs.keep_binary }}" == "true" ]; then
+            ARGS+=("--keep-binary")
+          fi
+
           if [ -n "${{ inputs.targets }}" ] && [ "${{ runner.os }}" == "Linux" ]; then
             ARGS+=("--targets" "${{ inputs.targets }}")
           fi
@@ -156,6 +175,14 @@ jobs:
 
           if ("${{ inputs.hide_title_bar }}" -eq "true") {
             $args += "--hide-title-bar"
+          }
+
+          if ("${{ inputs.new_window }}" -eq "true") {
+            $args += "--new-window"
+          }
+
+          if ("${{ inputs.keep_binary }}" -eq "true") {
+            $args += "--keep-binary"
           }
 
           Write-Host "Running: node dist/cli.js $($args -join ' ')"
